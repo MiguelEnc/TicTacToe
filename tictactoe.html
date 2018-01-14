@@ -7,14 +7,14 @@
 </head>
 <body>
 
-  <div>
-    <div>
+  <div class="wrapper">
+    <div id="players-board">
       <div class="player">
         <h1>O</h1>
         <p id="player1">Player 1</p>
       </div>
       <div class="points">
-        <h3><span id="p1-points">1</span>:<span id="p2-points">0</span></h3>
+        <h3><span id="p1-points">0</span>:<span id="p2-points">0</span></h3>
       </div>
       <div class="player">
         <h1>X</h1>
@@ -23,24 +23,24 @@
     </div>
     <table class="board">
       <tr>
-        <td class="cell" id="0"></td>
-        <td class="cell" id="1"></td>
-        <td class="cell" id="2"></td>
+        <td class="cell border-r border-b" id="0"></td>
+        <td class="cell border-b" id="1"></td>
+        <td class="cell border-b border-l" id="2"></td>
       </tr>
       <tr>
-        <td class="cell" id="3"></td>
+        <td class="cell border-r" id="3"></td>
         <td class="cell" id="4"></td>
-        <td class="cell" id="5"></td>
+        <td class="cell border-l" id="5"></td>
       </tr>
       <tr>
-        <td class="cell" id="6"></td>
-        <td class="cell" id="7"></td>
-        <td class="cell" id="8"></td>
+        <td class="cell border-r border-t" id="6"></td>
+        <td class="cell border-t" id="7"></td>
+        <td class="cell border-t border-l" id="8"></td>
       </tr>
     </table>
-    
-    <button>Play Again</button>
-    
+    <div class="bottom-panel">
+      <button id="playAgain">Play Again</button>
+    </div>
   </div>
 
   <script type="text/javascript" src="script.js"></script>
