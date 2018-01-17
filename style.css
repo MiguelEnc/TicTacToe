@@ -45,6 +45,7 @@ body {
   text-align: center;
   vertical-align: middle;
   cursor: pointer;
+  font-size: 2.5em;
 }
 
 .border-t {
@@ -86,10 +87,10 @@ body {
   font-weight: 600;
 }
 
-.btn-large:hover {
-  background-color: #CBDBF6;
-}
-
 #player-o {
   margin-left: 40px;
+}
+
+.btn-large:hover {
+  background-color: #CBDBF6;
 }
