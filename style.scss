@@ -1,0 +1,118 @@
+$blue: #CBDBF6;
+$grey: #5f5f5f;
+$board-lines: 2px solid #333;
+
+body {
+  background-color: #FAECE8;
+  font-family: "Arial";
+}
+
+.wrapper {
+  width: 325px;
+  background-color: $blue;
+  border-radius: 15px;
+  border: 5px solid $grey;
+  margin: 10em auto;
+  
+  #players-board{
+    color: #333;
+    display: grid;
+    grid-template-columns: 2fr 1fr 2fr;
+    grid-template-rows: 100px;
+  }
+}
+
+
+%board-player-symbol {
+  margin: 0;
+  font-size: 3em;
+  text-align: center;
+  padding-top: 15px;
+}
+
+#player1-symbol, 
+#player2-symbol {
+  @extend %board-player-symbol
+}
+
+
+%board-player-label {
+  margin-top: 0;
+  text-align: center;
+}
+#player1-label,
+#player2-label {
+  @extend %board-player-label
+}
+
+
+.points h4 {
+  text-align: center;
+  margin-top: 25px;
+}
+
+.board {
+  margin: 15px 0;
+  
+  .cell {
+    height: 100px;
+    width: 100px;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    font-size: 2.5em;
+  }
+  
+  .border-t {
+    border-top: $board-lines;
+  }
+
+  .border-l {
+    border-left: $board-lines;
+  }
+
+  .border-r {
+    border-right: $board-lines;
+  }
+
+  .border-b {
+    border-bottom: $board-lines;
+  }
+}
+
+
+.bottom-panel {
+  text-align: center;
+  padding: 15px;
+  
+  #playAgain {
+    width: 120px;
+    height: 45px;
+    color: #fff;
+    font-size: 17px;
+    background-color: $grey;
+    cursor: pointer;
+  }
+}
+
+
+.btn-large {
+  height: 65px;
+  line-height: 65px;
+  width: 90px;
+  background-color: $grey;
+  font-size: 2em;
+  font-weight: 600;
+  
+  .btn-large:hover {
+    background-color: $blue;
+  }
+}
+
+#player-o {
+  margin-left: 40px;
+}
+
+.currentTurn {
+  font-weight: 800;
+}
