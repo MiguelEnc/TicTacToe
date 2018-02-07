@@ -46,6 +46,7 @@ document.getElementById('playAgain').onclick = function(){
 
 function initializeBoard(){
   originalBoard = Array.from(Array(9).keys());
+  originalBoard.fill("");
   let cells = document.querySelectorAll('.cell');
 
   for(var i = 0; i < cells.length; i++){
@@ -67,13 +68,101 @@ function playOnCell(cellId, player) {
     
     originalBoard[cellId] = player;
     document.getElementById(cellId).innerText = player;
-    if(playerWin(originalBoard, playerOnTurn)){
+    if(playerWins(originalBoard, playerOnTurn)){
       console.log('ganador');
     } else changeTurn();
   }  
 }
 
-function playerWin(board, player) {
+
+
+// a Node represents the states on the game tree
+function nodeFactory(currentPlayer, currentState, action) {
+  return {
+    state: [],
+    utility: 0,
+    maximizing: true,
+    parentNode: null,
+    childrenNodes: [],
+    visitedNode: false,
+
+    // this node's player
+    getPlayer: function() {
+      if(currentPlayer === 'X') return 'O';
+      else return 'X';
+    },
+
+    // a node is terminal when a player wins on it's state
+    isTerminal: function(){
+      if(playerWins(this.getState(), this.getPlayer())){
+        if(this.isMaximizing()){
+          this.setUtility(10);
+        } else {
+          this.setUtility(-10);
+        }
+        return true;
+      } 
+      return false;
+    },
+
+    // board state
+    getState: function(){
+      this.state = currentState;
+      this.state[action] = this.getPlayer();
+      return this.state;
+    },
+
+    // Returns array of blank spaces of this node state
+    // which are available actions of this node's childrens
+    getAvailableActions: function(){
+      let availableActions = [];
+      this.getState().map(position => {
+        if(position !== 'X' && position !== 'O')
+        availableActions.push(this.state.indexOf(position));
+      });
+      return availableActions;
+    },
+    
+    // the value of this state for this player
+    getUtility: function(){
+      return this.utility;
+    },
+
+    setUtility: function(utility){
+      this.utility = utility;
+    },
+    
+    isMaximizing: function(){
+      //TODO: calcular utilidad en base a esto
+      return this.maximizing;
+    },
+    setMaximizing: function(maximizing){
+      //TODO: calcular utilidad en base a esto
+      this.maximizing = maximizing;
+    },
+    
+    // this node's parent
+    getParentNode: function(){
+      return this.parentNode;
+    },
+    setParentNode: function(node){
+      this.parentNode = node;
+    },
+
+    getChildrenNodes(){
+      return this.childrenNodes;
+    },
+    
+    wasVisited(){
+      return this.visitedNode;
+    },
+    setVisited(visited){
+      this.visitedNode = visited;
+    }
+  };
+}
+
+function playerWins(board, player) {
   winPositions.map(winCombo => {
     if(board[winCombo[0]] === board[winCombo[1]] &&
        board[winCombo[0]] === board[winCombo[2]]){
