@@ -33,8 +33,8 @@ $(document).ready(function(){
       }
     }
   );
-  initializeBoard();
   $('#playerSelectionModal').modal('open');
+  initializeBoard();
 });
 
 document.getElementById('playAgain').onclick = function(){
@@ -45,8 +45,12 @@ document.getElementById('playAgain').onclick = function(){
 
 
 function initializeBoard(){
-  originalBoard = Array.from(Array(9).keys());
-  originalBoard.fill("");
+  // originalBoard = Array.from(Array(9).keys());
+  // originalBoard.fill("");
+  originalBoard = ["X","O","X","O","","X","X","",""];
+  let parentNode = nodeFactory('X', originalBoard, null);
+  generateTree(parentNode);
+
   let cells = document.querySelectorAll('.cell');
 
   for(var i = 0; i < cells.length; i++){
@@ -75,91 +79,124 @@ function playOnCell(cellId, player) {
 }
 
 
+function generateTree(parentNode){
+  parentNode.getAvailableActions().map(action => {
+    let childrenNode = nodeFactory(parentNode.getPlayer(), parentNode.getState(), action);
+    childrenNode.setParentNode(parentNode);
+    parentNode.getChildrenNodes().push(childrenNode);
 
-// a Node represents the states on the game tree
+    if(parentNode.isMaximizing()){
+      childrenNode.setMaximizing(false);
+    } else {
+      childrenNode.setMaximizing(true);
+    }
+
+    if(!boardFull(childrenNode.getState())){
+      generateTree(childrenNode);
+    }
+  });
+}
+
+function boardFull(board){
+  return board.includes("") ? false : true;
+}
+
+
+// a Node represents a state on the game tree
 function nodeFactory(currentPlayer, currentState, action) {
-  return {
-    state: [],
-    utility: 0,
-    maximizing: true,
-    parentNode: null,
-    childrenNodes: [],
-    visitedNode: false,
 
-    // this node's player
-    getPlayer: function() {
-      if(currentPlayer === 'X') return 'O';
-      else return 'X';
+  var node = {
+    _player: '',
+    _state: [],
+    _maximizing: true,
+    _utility: 0,
+    _availableActions: [],
+    _terminal: false,
+    _parentNode: null,
+    _childrenNodes: [],
+
+    getPlayer: function() {      
+      return this._player;
     },
 
-    // a node is terminal when a player wins on it's state
-    isTerminal: function(){
-      if(playerWins(this.getState(), this.getPlayer())){
-        if(this.isMaximizing()){
-          this.setUtility(10);
-        } else {
-          this.setUtility(-10);
-        }
-        return true;
-      } 
-      return false;
-    },
-
-    // board state
     getState: function(){
-      this.state = currentState;
-      this.state[action] = this.getPlayer();
-      return this.state;
+      return this._state;
     },
 
-    // Returns array of blank spaces of this node state
-    // which are available actions of this node's childrens
-    getAvailableActions: function(){
-      let availableActions = [];
-      this.getState().map(position => {
-        if(position !== 'X' && position !== 'O')
-        availableActions.push(this.state.indexOf(position));
-      });
-      return availableActions;
+    isMaximizing: function(){
+      return this._maximizing;
     },
-    
-    // the value of this state for this player
+
+    setMaximizing: function(maximizing){
+      this._maximizing = maximizing;
+    },
+
     getUtility: function(){
-      return this.utility;
+      return this._utility;
     },
 
     setUtility: function(utility){
-      this.utility = utility;
-    },
-    
-    isMaximizing: function(){
-      //TODO: calcular utilidad en base a esto
-      return this.maximizing;
-    },
-    setMaximizing: function(maximizing){
-      //TODO: calcular utilidad en base a esto
-      this.maximizing = maximizing;
-    },
-    
-    // this node's parent
-    getParentNode: function(){
-      return this.parentNode;
-    },
-    setParentNode: function(node){
-      this.parentNode = node;
+      this._utility = utility;
     },
 
-    getChildrenNodes(){
-      return this.childrenNodes;
+    // available actions are free spots to play on this state 
+    getAvailableActions: function(){
+      return this._availableActions;
     },
-    
-    wasVisited(){
-      return this.visitedNode;
+
+    // a node is terminal when a player wins on its state
+    isTerminal: function(){
+      return this._terminal;
     },
-    setVisited(visited){
-      this.visitedNode = visited;
+
+    getParentNode: function(){
+      return this._parentNode;
+    },
+
+    setParentNode: function(node){
+      this._parentNode = node;
+    },
+
+    getChildrenNodes: function(){
+      return this._childrenNodes;
+    },
+
+    addChildrenNode: function(node){
+      this._childrenNodes.push(node);
     }
   };
+
+  // initialize node properties
+  (function init(){
+    // player
+    currentPlayer === 'X' ? node._player = 'O' : node._player = 'X';
+
+    // state
+    node._state = currentState;
+    if(action !== null){
+      node._state[action] = node._player;
+    }
+
+    // available actions
+    for(var i = 0; i < node._state.length; i++){
+      if(node._state[i] === "")
+        node._availableActions.push(i);
+    }
+
+    // terminal
+    if(playerWins(node._state, node._player)){
+      if(node.isMaximizing()){
+        node.setUtility(10);
+      } else {
+        node.setUtility(-10);
+      }
+      node._terminal = true;
+    } else{
+      node._terminal = false;
+    }
+  })();
+  
+  return node;
 }
 
 function playerWins(board, player) {
