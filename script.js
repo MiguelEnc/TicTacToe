@@ -47,7 +47,7 @@ document.getElementById('playAgain').onclick = function(){
 function initializeBoard(){
   // originalBoard = Array.from(Array(9).keys());
   // originalBoard.fill("");
-  originalBoard = ["X","O","X","O","","X","X","",""];
+  originalBoard = ["X","O","O","","X","X","X","","O"];
   let parentNode = nodeFactory('X', originalBoard, null);
   generateTree(parentNode);
 
@@ -78,12 +78,18 @@ function playOnCell(cellId, player) {
   }  
 }
 
-
+/**
+ * Generates a tree of possible plays of both players starting from given node
+ * @param parentNode root node
+ */
 function generateTree(parentNode){
+
+  // available actions are free spots to play on this node
   parentNode.getAvailableActions().map(action => {
-    let childrenNode = nodeFactory(parentNode.getPlayer(), parentNode.getState(), action);
+
+    let childrenNode = nodeFactory(parentNode.getPlayer(), parentNode.getBoard(), action);
     childrenNode.setParentNode(parentNode);
-    parentNode.getChildrenNodes().push(childrenNode);
+    parentNode.addChildrenNode(childrenNode);
 
     if(parentNode.isMaximizing()){
       childrenNode.setMaximizing(false);
@@ -91,114 +97,138 @@ function generateTree(parentNode){
       childrenNode.setMaximizing(true);
     }
 
-    if(!boardFull(childrenNode.getState())){
+    if(!boardFull(childrenNode.getBoard()) || !childrenNode.isTerminal()) {
       generateTree(childrenNode);
     }
   });
 }
 
+/**
+ * Tells if board is full or have blank spaces
+ * @param board the board to examine
+ */
 function boardFull(board){
   return board.includes("") ? false : true;
 }
 
 
-// a Node represents a state on the game tree
+/**
+ * Factory of nodes that represents each board of the game tree
+ * @param currentPlayer the last player who played
+ * @param currentState  the state of invoking node
+ * @param action        place where the created node will play
+ */
 function nodeFactory(currentPlayer, currentState, action) {
 
-  var node = {
-    _player: '',
-    _state: [],
-    _maximizing: true,
-    _utility: 0,
-    _availableActions: [],
-    _terminal: false,
-    _parentNode: null,
-    _childrenNodes: [],
+  var 
+    // this node player
+    _player = '',
 
+    // game board
+    _board = [],
+
+    // places where childrens of this node will be able to play
+    _availableActions = [],
+
+    // references needed to traverse the tree
+    _parentNode = null,
+    _childrenNodes = [],
+
+    // whether this node will try to get the maximum score possible
+    _maximizing = true,
+
+    // 
+    _utility = 0,
+
+    // whether a player wins on this node's state
+    _terminal = false;
+  
+
+  _board = currentState.slice(0);
+  if (action !== null) {
+    currentPlayer === 'X' ? _player = 'O' : _player = 'X';
+    _board[action] = _player;
+  } else {
+    _player = currentPlayer;
+  }
+
+  for (var i = 0; i < _board.length; i++) {
+    if(_board[i] === "")
+      _availableActions.push(i);
+  }
+
+  if (playerWins(_board, _player)){
+    if(_maximizing){
+      _utility = 10;
+    } else {
+      _utility = -10;
+    }
+    _terminal = true;
+  } else{
+    _terminal = false;
+  }
+  
+
+  var node = {
+    
     getPlayer: function() {      
-      return this._player;
+      return _player;
     },
 
-    getState: function(){
-      return this._state;
+    getBoard: function(){
+      return _board;
     },
 
     isMaximizing: function(){
-      return this._maximizing;
+      return _maximizing;
     },
 
     setMaximizing: function(maximizing){
-      this._maximizing = maximizing;
+      _maximizing = maximizing;
     },
 
     getUtility: function(){
-      return this._utility;
+      return _utility;
     },
 
     setUtility: function(utility){
-      this._utility = utility;
+      _utility = utility;
     },
 
-    // available actions are free spots to play on this state 
     getAvailableActions: function(){
-      return this._availableActions;
+      return _availableActions;
     },
 
-    // a node is terminal when a player wins on its state
     isTerminal: function(){
-      return this._terminal;
+      return _terminal;
     },
 
     getParentNode: function(){
-      return this._parentNode;
+      return _parentNode;
     },
 
     setParentNode: function(node){
-      this._parentNode = node;
+      _parentNode = node;
     },
 
     getChildrenNodes: function(){
-      return this._childrenNodes;
+      return _childrenNodes;
     },
 
     addChildrenNode: function(node){
-      this._childrenNodes.push(node);
+      _childrenNodes.push(node);
     }
   };
-
-  // initialize node properties
-  (function init(){
-    // player
-    currentPlayer === 'X' ? node._player = 'O' : node._player = 'X';
-
-    // state
-    node._state = currentState;
-    if(action !== null){
-      node._state[action] = node._player;
-    }
-
-    // available actions
-    for(var i = 0; i < node._state.length; i++){
-      if(node._state[i] === "")
-        node._availableActions.push(i);
-    }
-
-    // terminal
-    if(playerWins(node._state, node._player)){
-      if(node.isMaximizing()){
-        node.setUtility(10);
-      } else {
-        node.setUtility(-10);
-      }
-      node._terminal = true;
-    } else{
-      node._terminal = false;
-    }
-  })();
   
   return node;
 }
 
+
+/**
+ * Determines if a given player wins on the given board
+ * @param board  where to look for a winner
+ * @param player consulted player to win
+ */
 function playerWins(board, player) {
   winPositions.map(winCombo => {
     if(board[winCombo[0]] === board[winCombo[1]] &&
