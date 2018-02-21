@@ -1,7 +1,7 @@
 var humanPlayer = '',
     computer = '',
     playerOnTurn = '',
-    originalBoard = [],
+    mainBoard = [],
     winPositions = [
       // horizontally
       [0,1,2],
@@ -37,74 +37,128 @@ $(document).ready(function(){
   initializeBoard();
 });
 
-document.getElementById('playAgain').onclick = function(){
-  initializeBoard();
-  // TODO: if game over, add points to winner
-  // TODO: reset player on turn
-}
 
 
+/**
+ * initializes the game tree
+ * sets cells state and listener
+ */
 function initializeBoard(){
-  // originalBoard = Array.from(Array(9).keys());
-  // originalBoard.fill("");
-  originalBoard = ["X","O","O","","X","X","X","","O"];
-  let parentNode = nodeFactory('X', originalBoard, null);
+  // mainBoard = Array.from(Array(9).keys());
+  // mainBoard.fill("");
+  mainBoard = ["X","O","O",
+                "","X","",
+               "X","","O"];
+  let parentNode = nodeFactory('O', mainBoard, null);
   generateTree(parentNode);
+  calculateNodesUtility(parentNode);
 
   let cells = document.querySelectorAll('.cell');
 
   for(var i = 0; i < cells.length; i++){
     cells[i].innerText = '';
-    cells[i].style.removeProperty('background-color') ;
     cells[i].addEventListener('click', playerClick);
   }
 }
 
+
+
+/**
+ * Callback for each cell on board
+ * @param cell clicked cell
+ */
 function playerClick(cell){
   playOnCell(cell.target.id, playerOnTurn);
 }
 
+
+
+/**
+ * Renders the move made
+ * @param cellId id of clicked cell
+ * @param player who played
+ */
 function playOnCell(cellId, player) {
   
-  // When position haven't been played
-  if(originalBoard[cellId] !== humanPlayer & 
-     originalBoard[cellId] !== computer){
+  // When the position hasn't been played
+  if(mainBoard[cellId] !== humanPlayer & 
+     mainBoard[cellId] !== computer){
     
-    originalBoard[cellId] = player;
+    mainBoard[cellId] = player;
     document.getElementById(cellId).innerText = player;
-    if(playerWins(originalBoard, playerOnTurn)){
-      console.log('ganador');
-    } else changeTurn();
+
+    changeTurn();
   }  
 }
 
+
+
 /**
  * Generates a tree of possible plays of both players starting from given node
- * @param parentNode root node
+ * @param rootNode
  */
-function generateTree(parentNode){
+function generateTree(rootNode){
 
-  // available actions are free spots to play on this node
-  parentNode.getAvailableActions().map(action => {
+  // available actions are this node's free spots to play
+  rootNode.getAvailableActions().map(action => {
 
-    let childrenNode = nodeFactory(parentNode.getPlayer(), parentNode.getBoard(), action);
-    childrenNode.setParentNode(parentNode);
-    parentNode.addChildrenNode(childrenNode);
+    // create a node representing each possible move on the board
+    let childNode = nodeFactory(rootNode.getPlayer(), rootNode.getBoard(), action);
+    childNode.setParentNode(rootNode);
+    rootNode.addChildNode(childNode);
 
-    if(parentNode.isMaximizing()){
-      childrenNode.setMaximizing(false);
+    if(rootNode.isMaximizing()){
+      childNode.setMaximizing(false);
     } else {
-      childrenNode.setMaximizing(true);
+      childNode.setMaximizing(true);
     }
 
-    if(!boardFull(childrenNode.getBoard()) || !childrenNode.isTerminal()) {
-      generateTree(childrenNode);
+    if(!boardFull(childNode.getBoard()) && !childNode.isTerminal()) {
+      generateTree(childNode);
     }
   });
 }
 
+
+
 /**
- * Tells if board is full or have blank spaces
+ * Traverses the tree using DFS and calculates the utility
+ * of the parent nodes based on its children node's utility
+ * @param rootNode 
+ */
+function calculateNodesUtility(rootNode){
+
+  if(rootNode.getChildNodes().length > 0){
+
+    rootNode.getChildNodes().map(childNode => {
+
+      calculateNodesUtility(childNode);
+
+    });
+
+  }
+
+  if(rootNode.getParentNode() != null){
+    let rootParent = rootNode.getParentNode();
+    if(rootParent.isMaximizing()){
+
+      if(rootNode.getUtility() > rootParent.getUtility())
+        rootParent.setUtility(rootNode.getUtility());
+
+    } else {
+
+      if(rootNode.getUtility() < rootParent.getUtility())
+        rootParent.setUtility(rootNode.getUtility());
+
+    }
+  }
+  
+}
+
+
+
+/**
+ * Determines if board is full or have blank spaces
  * @param board the board to examine
  */
 function boardFull(board){
@@ -112,13 +166,14 @@ function boardFull(board){
 }
 
 
+
 /**
  * Factory of nodes that represents each board of the game tree
- * @param currentPlayer the last player who played
- * @param currentState  the state of invoking node
- * @param action        place where the created node will play
+ * @param lastPlayer the last player who made a move
+ * @param lastBoard  the board of invoking node
+ * @param action     place where the created node will play
  */
-function nodeFactory(currentPlayer, currentState, action) {
+function nodeFactory(lastPlayer, lastBoard, action) {
 
   var 
     // this node player
@@ -132,24 +187,24 @@ function nodeFactory(currentPlayer, currentState, action) {
 
     // references needed to traverse the tree
     _parentNode = null,
-    _childrenNodes = [],
+    _childNodes = [],
 
     // whether this node will try to get the maximum score possible
     _maximizing = true,
 
-    // 
+    // this node's move value
     _utility = 0,
 
     // whether a player wins on this node's state
     _terminal = false;
   
 
-  _board = currentState.slice(0);
+  _board = lastBoard.slice(0);
   if (action !== null) {
-    currentPlayer === 'X' ? _player = 'O' : _player = 'X';
+    lastPlayer === 'X' ? _player = 'O' : _player = 'X';
     _board[action] = _player;
   } else {
-    _player = currentPlayer;
+    _player = lastPlayer;
   }
 
   for (var i = 0; i < _board.length; i++) {
@@ -211,17 +266,18 @@ function nodeFactory(currentPlayer, currentState, action) {
       _parentNode = node;
     },
 
-    getChildrenNodes: function(){
-      return _childrenNodes;
+    getChildNodes: function(){
+      return _childNodes;
     },
 
-    addChildrenNode: function(node){
-      _childrenNodes.push(node);
+    addChildNode: function(node){
+      _childNodes.push(node);
     }
   };
   
   return node;
 }
+
 
 
 /**
@@ -230,16 +286,21 @@ function nodeFactory(currentPlayer, currentState, action) {
  * @param player consulted player to win
  */
 function playerWins(board, player) {
+  let wins = false;
   winPositions.map(winCombo => {
     if(board[winCombo[0]] === board[winCombo[1]] &&
        board[winCombo[0]] === board[winCombo[2]]){
-      return true;
+      wins = true;
     }
   });
-  return false;
+  return wins;
 }
 
 
+
+/**
+ * Changes the PlayerOnTurn reference and renders the turn on board
+ */
 function changeTurn() {
   if(playerOnTurn === humanPlayer){
     playerOnTurn = computer;
@@ -261,23 +322,32 @@ function changeTurn() {
 }
 
 
+
+document.getElementById('playAgain').onclick = function(){
+  initializeBoard();
+}
+
+
+
 // Player X selection on modal event
 document.getElementById('player-x').onclick = function(){
   document.getElementById('player1-label').innerText = 'Computer';
   document.getElementById('player2-label').innerText = 'Player';
-  document.getElementById('player2-label').classList.add('currentTurn');
+  document.getElementById('player1-symbol').classList.add('currentTurn');
   document.getElementById('player2-symbol').classList.add('currentTurn');
   humanPlayer = 'X';
   computer = 'O';
   playerOnTurn = humanPlayer;
 };
 
+
+
 // Player O selection on modal event
 document.getElementById('player-o').onclick = function(){
   document.getElementById('player1-label').innerText = 'Player';
   document.getElementById('player2-label').innerText = 'Computer';
-  document.getElementById('player1-label').classList.add('currentTurn');
   document.getElementById('player1-symbol').classList.add('currentTurn');
+  document.getElementById('player2-symbol').classList.add('currentTurn');
   humanPlayer = 'O';
   computer = 'X';
   playerOnTurn = humanPlayer;
