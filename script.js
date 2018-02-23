@@ -1,20 +1,33 @@
-var humanPlayer = '',
-    computer = '',
-    playerOnTurn = '',
-    mainBoard = [],
-    winPositions = [
-      // horizontally
-      [0,1,2],
-      [3,4,5],
-      [6,7,8],
-      // vertically
-      [0,3,6],
-      [1,4,7],
-      [2,5,8],
-      // diagonally
-      [0,4,8],
-      [2,4,6]
-    ];
+var 
+  // player's selected symbol
+  humanPlayer = '',
+
+  // computer symbol
+  computer = '',
+
+  // reference to who's playing at the moment
+  playerOnTurn = '',
+
+  // game tree root node
+  rootNode,
+
+  // state of the game board
+  mainBoard = [],
+
+  // array of winning combinations based on a matrix
+  winPositions = [
+    // horizontally
+    [0,1,2],
+    [3,4,5],
+    [6,7,8],
+    // vertically
+    [0,3,6],
+    [1,4,7],
+    [2,5,8],
+    // diagonally
+    [0,4,8],
+    [2,4,6]
+  ];
 
 
 $(document).ready(function(){
@@ -49,13 +62,14 @@ function initializeBoard(){
   mainBoard = ["X","O","O",
                 "","X","",
                "X","","O"];
-  let parentNode = nodeFactory('O', mainBoard, null);
-  generateTree(parentNode);
-  calculateNodesUtility(parentNode);
+  rootNode = nodeFactory('O', mainBoard, null);
+  generateTree(rootNode);
+  calculateNodesUtility(rootNode);
 
-  let cells = document.querySelectorAll('.cell');
-
-  for(var i = 0; i < cells.length; i++){
+  var cells = document.querySelectorAll('.cell'),
+      cellsLength = cells.length,
+      i = 0;
+  for(i; i < cellsLength; i++){
     cells[i].innerText = '';
     cells[i].addEventListener('click', playerClick);
   }
@@ -65,7 +79,7 @@ function initializeBoard(){
 
 /**
  * Callback for each cell on board
- * @param cell clicked cell
+ * @param {Object} cell clicked cell
  */
 function playerClick(cell){
   playOnCell(cell.target.id, playerOnTurn);
@@ -75,8 +89,8 @@ function playerClick(cell){
 
 /**
  * Renders the move made
- * @param cellId id of clicked cell
- * @param player who played
+ * @param {Number} cellId id of clicked cell
+ * @param {String} player who played
  */
 function playOnCell(cellId, player) {
   
@@ -95,7 +109,7 @@ function playOnCell(cellId, player) {
 
 /**
  * Generates a tree of possible plays of both players starting from given node
- * @param rootNode
+ * @param {Object} rootNode
  */
 function generateTree(rootNode){
 
@@ -124,7 +138,7 @@ function generateTree(rootNode){
 /**
  * Traverses the tree using DFS and calculates the utility
  * of the parent nodes based on its children node's utility
- * @param rootNode 
+ * @param {Object} rootNode 
  */
 function calculateNodesUtility(rootNode){
 
@@ -158,20 +172,10 @@ function calculateNodesUtility(rootNode){
 
 
 /**
- * Determines if board is full or have blank spaces
- * @param board the board to examine
- */
-function boardFull(board){
-  return board.includes("") ? false : true;
-}
-
-
-
-/**
  * Factory of nodes that represents each board of the game tree
- * @param lastPlayer the last player who made a move
- * @param lastBoard  the board of invoking node
- * @param action     place where the created node will play
+ * @param {String} lastPlayer the last player who made a move
+ * @param {Array}  lastBoard  the board of invoking node
+ * @param {Number} action     place where the created node will play
  */
 function nodeFactory(lastPlayer, lastBoard, action) {
 
@@ -196,7 +200,10 @@ function nodeFactory(lastPlayer, lastBoard, action) {
     _utility = 0,
 
     // whether a player wins on this node's state
-    _terminal = false;
+    _terminal = false,
+    
+    // the action this node took
+    _action = action;
   
 
   _board = lastBoard.slice(0);
@@ -258,6 +265,10 @@ function nodeFactory(lastPlayer, lastBoard, action) {
       return _terminal;
     },
 
+    getAction: function(){
+      return _action;
+    },
+
     getParentNode: function(){
       return _parentNode;
     },
@@ -282,8 +293,8 @@ function nodeFactory(lastPlayer, lastBoard, action) {
 
 /**
  * Determines if a given player wins on the given board
- * @param board  where to look for a winner
- * @param player consulted player to win
+ * @param {Array}  board  where to look for a winner
+ * @param {String} player consulted player to win
  */
 function playerWins(board, player) {
   let wins = false;
@@ -294,6 +305,16 @@ function playerWins(board, player) {
     }
   });
   return wins;
+}
+
+
+
+/**
+ * Determines if board is full or have blank spaces
+ * @param {Array} board the board to examine
+ */
+function boardFull(board){
+  return board.includes("") ? false : true;
 }
 
 
