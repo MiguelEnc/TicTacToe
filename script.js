@@ -172,6 +172,40 @@ function calculateNodesUtility(rootNode){
 
 
 /**
+ * Gets the best move to make from the given board
+ * @param {Array} currentBoard 
+ */
+function getBestMove(currentBoard) {
+  var move = 0, 
+      newRoot = null;
+
+  // Find currentBoard on the game tree
+  rootNode.getChildNodes().map(child => {
+
+    if(currentBoard.equals(child.getBoard())){
+      newRoot = child;
+    }
+
+  });
+
+  // Find wich action gave currentBoard its utility
+  // and update rootNode to this child, since future
+  // moves will happend from this position.
+  newRoot.getChildNodes().map(child => {
+
+    if(child.getUtility() === newRoot.getUtility()){
+      move = child.getAction();
+      rootNode = child;
+    }
+
+  });
+
+  return move;
+}
+
+
+
+/**
  * Factory of nodes that represents each board of the game tree
  * @param {String} lastPlayer the last player who made a move
  * @param {Array}  lastBoard  the board of invoking node
@@ -315,6 +349,25 @@ function playerWins(board, player) {
  */
 function boardFull(board){
   return board.includes("") ? false : true;
+}
+
+
+
+/**
+ * Determines arrays equality by comparing their values
+ * @param {Array} array 
+ */
+Array.prototype.equals = function (array) {
+  var i = 0,
+      len = this.length;
+
+  for (i = 0; i < len; i++) {
+      
+      if (this[i] != array[i]) {
+        return false;
+      }
+  }
+  return true;
 }
 
 
