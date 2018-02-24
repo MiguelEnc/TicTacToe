@@ -53,18 +53,13 @@ $(document).ready(function(){
 
 
 /**
- * initializes the game tree
- * sets cells state and listener
+ * Initializes the board
+ * Sets cells state and listener
  */
 function initializeBoard(){
-  // mainBoard = Array.from(Array(9).keys());
-  // mainBoard.fill("");
-  mainBoard = ["X","O","O",
-                "","X","",
-               "X","","O"];
-  rootNode = nodeFactory('O', mainBoard, null);
-  generateTree(rootNode);
-  calculateNodesUtility(rootNode);
+  mainBoard = ["","","",
+               "","","",
+               "","",""];
 
   var cells = document.querySelectorAll('.cell'),
       cellsLength = cells.length,
@@ -73,6 +68,18 @@ function initializeBoard(){
     cells[i].innerText = '';
     cells[i].addEventListener('click', playerClick);
   }
+}
+
+
+
+/**
+ * Initializes the game tree using 
+ * the clean board as starting point 
+ */
+function initializeGameTree(){
+  rootNode = nodeFactory(humanPlayer, mainBoard, null);
+  generateTree(rootNode);
+  calculateNodesUtility(rootNode);
 }
 
 
@@ -412,6 +419,7 @@ document.getElementById('player-x').onclick = function(){
   humanPlayer = 'X';
   computer = 'O';
   playerOnTurn = humanPlayer;
+  initializeGameTree();
 };
 
 
@@ -425,4 +433,5 @@ document.getElementById('player-o').onclick = function(){
   humanPlayer = 'O';
   computer = 'X';
   playerOnTurn = humanPlayer;
+  initializeGameTree();
 };
