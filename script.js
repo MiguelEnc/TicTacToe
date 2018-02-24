@@ -77,7 +77,7 @@ function initializeBoard(){
  * the clean board as starting point 
  */
 function initializeGameTree(){
-  rootNode = nodeFactory(humanPlayer, mainBoard, null);
+  rootNode = nodeFactory(computer, mainBoard, null);
   generateTree(rootNode);
   calculateNodesUtility(rootNode);
 }
@@ -89,7 +89,12 @@ function initializeGameTree(){
  * @param {Object} cell clicked cell
  */
 function playerClick(cell){
+  // human player move
   playOnCell(cell.target.id, playerOnTurn);
+
+  // computer move
+  var bestMoveForComputer = getBestMove(mainBoard);
+  playOnCell(bestMoveForComputer, computer);
 }
 
 
@@ -194,7 +199,7 @@ function getBestMove(currentBoard) {
     }
 
   });
-
+  
   // Find wich action gave currentBoard its utility
   // and update rootNode to this child, since future
   // moves will happend from this position.
@@ -341,7 +346,8 @@ function playerWins(board, player) {
   let wins = false;
   winPositions.map(winCombo => {
     if(board[winCombo[0]] === board[winCombo[1]] &&
-       board[winCombo[0]] === board[winCombo[2]]){
+       board[winCombo[0]] === board[winCombo[2]] &&
+       board[winCombo[0]] === player){
       wins = true;
     }
   });
@@ -419,7 +425,7 @@ document.getElementById('playAgain').onclick = function(){
 document.getElementById('player-x').onclick = function(){
   player1Label.innerText = 'Computer';
   player2Label.innerText = 'Player';
-  player1Symbol.classList.add('currentTurn');
+  player2Label.classList.add('currentTurn');
   player2Symbol.classList.add('currentTurn');
   humanPlayer = 'X';
   computer = 'O';
@@ -433,8 +439,8 @@ document.getElementById('player-x').onclick = function(){
 document.getElementById('player-o').onclick = function(){
   player1Label.innerText = 'Player';
   player2Label.innerText = 'Computer';
+  player1Label.classList.add('currentTurn');
   player1Symbol.classList.add('currentTurn');
-  player2Symbol.classList.add('currentTurn');
   humanPlayer = 'O';
   computer = 'X';
   playerOnTurn = humanPlayer;
