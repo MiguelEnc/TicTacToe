@@ -42,7 +42,10 @@ $(document).ready(function(){
       endingTop: '40%',
       ready: function(modal) {
         // Sets modal on the center of the screen vertically
-        modal.css('transform', 'translateY(-40%)');        
+        modal.css('transform', 'translateY(-40%)');
+      },
+      complete: function() {
+        initializeGameTree();
       }
     }
   );
@@ -77,11 +80,11 @@ function initializeBoard(){
  * the clean board as starting point 
  */
 function initializeGameTree(){
-  rootNode = nodeFactory(computer, mainBoard, null);
+  rootNode = nodeFactory(computer, mainBoard, null);  
   generateTree(rootNode);
   calculateNodesUtility(rootNode);
 }
-
+  
 
 
 /**
@@ -105,7 +108,7 @@ function playerClick(cell){
  * @param {String} player who played
  */
 function playOnCell(cellId, player) {
-  
+
   // When the position hasn't been played
   if(mainBoard[cellId] !== humanPlayer & 
      mainBoard[cellId] !== computer){
@@ -114,7 +117,7 @@ function playOnCell(cellId, player) {
     document.getElementById(cellId).innerText = player;
 
     changeTurn();
-  }  
+  }
 }
 
 
@@ -178,7 +181,7 @@ function calculateNodesUtility(rootNode){
 
     }
   }
-  
+
 }
 
 
@@ -421,7 +424,9 @@ document.getElementById('playAgain').onclick = function(){
 
 
 
-// Player X selection on modal event
+/**
+ * Player X selection on modal event
+ */
 document.getElementById('player-x').onclick = function(){
   player1Label.innerText = 'Computer';
   player2Label.innerText = 'Player';
@@ -430,12 +435,13 @@ document.getElementById('player-x').onclick = function(){
   humanPlayer = 'X';
   computer = 'O';
   playerOnTurn = humanPlayer;
-  initializeGameTree();
-};
+}
 
 
 
-// Player O selection on modal event
+/**
+ * Player O selection on modal event
+ */
 document.getElementById('player-o').onclick = function(){
   player1Label.innerText = 'Player';
   player2Label.innerText = 'Computer';
@@ -444,5 +450,4 @@ document.getElementById('player-o').onclick = function(){
   humanPlayer = 'O';
   computer = 'X';
   playerOnTurn = humanPlayer;
-  initializeGameTree();
-};
+}
