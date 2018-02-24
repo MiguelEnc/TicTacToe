@@ -379,6 +379,11 @@ Array.prototype.equals = function (array) {
 
 
 
+var player1Symbol = document.getElementById('player1-symbol'),
+    player1Label  = document.getElementById('player1-label'),
+    player2Symbol = document.getElementById('player2-symbol')
+    player2Label  = document.getElementById('player2-label');
+
 /**
  * Changes the PlayerOnTurn reference and renders the turn on board
  */
@@ -390,15 +395,15 @@ function changeTurn() {
   }
   
   if(playerOnTurn === 'X'){
-    document.getElementById('player1-symbol').classList.remove('currentTurn');
-    document.getElementById('player1-label').classList.remove('currentTurn');
-    document.getElementById('player2-symbol').classList.add('currentTurn');
-    document.getElementById('player2-label').classList.add('currentTurn');
+    player1Symbol.classList.remove('currentTurn');
+    player1Label.classList.remove('currentTurn');
+    player2Symbol.classList.add('currentTurn');
+    player2Label.classList.add('currentTurn');
   } else {
-    document.getElementById('player2-symbol').classList.remove('currentTurn');
-    document.getElementById('player2-label').classList.remove('currentTurn');
-    document.getElementById('player1-symbol').classList.add('currentTurn');
-    document.getElementById('player1-label').classList.add('currentTurn');
+    player2Symbol.classList.remove('currentTurn');
+    player2Label.classList.remove('currentTurn');
+    player1Symbol.classList.add('currentTurn');
+    player1Label.classList.add('currentTurn');
   }
 }
 
@@ -412,10 +417,10 @@ document.getElementById('playAgain').onclick = function(){
 
 // Player X selection on modal event
 document.getElementById('player-x').onclick = function(){
-  document.getElementById('player1-label').innerText = 'Computer';
-  document.getElementById('player2-label').innerText = 'Player';
-  document.getElementById('player1-symbol').classList.add('currentTurn');
-  document.getElementById('player2-symbol').classList.add('currentTurn');
+  player1Label.innerText = 'Computer';
+  player2Label.innerText = 'Player';
+  player1Symbol.classList.add('currentTurn');
+  player2Symbol.classList.add('currentTurn');
   humanPlayer = 'X';
   computer = 'O';
   playerOnTurn = humanPlayer;
@@ -426,10 +431,10 @@ document.getElementById('player-x').onclick = function(){
 
 // Player O selection on modal event
 document.getElementById('player-o').onclick = function(){
-  document.getElementById('player1-label').innerText = 'Player';
-  document.getElementById('player2-label').innerText = 'Computer';
-  document.getElementById('player1-symbol').classList.add('currentTurn');
-  document.getElementById('player2-symbol').classList.add('currentTurn');
+  player1Label.innerText = 'Player';
+  player2Label.innerText = 'Computer';
+  player1Symbol.classList.add('currentTurn');
+  player2Symbol.classList.add('currentTurn');
   humanPlayer = 'O';
   computer = 'X';
   playerOnTurn = humanPlayer;
