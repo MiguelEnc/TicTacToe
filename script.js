@@ -95,10 +95,12 @@ function initializeGameTree(){
 function playerClick(cell){
   // human player move
   playOnCell(cell.target.id, playerOnTurn);
-
+  
   // computer move
   var bestMoveForComputer = getBestMove(mainBoard);
-  playOnCell(bestMoveForComputer, computer);
+  setTimeout(function () {
+    playOnCell(bestMoveForComputer, computer);
+  }, 1000);
 }
 
 
