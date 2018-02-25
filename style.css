@@ -7,7 +7,7 @@ body {
   background-color: #CBDBF6;
   border-radius: 15px;
   border: 5px solid #5f5f5f;
-  margin: 10em auto; }
+  margin: 8em auto; }
   .wrapper #players-board {
     color: #333;
     display: grid;
@@ -28,7 +28,12 @@ body {
 
 .points h4 {
   text-align: center;
-  margin-top: 25px; }
+  margin-top: 25px;
+  margin-bottom: 0px; }
+.points p {
+  margin-top: 5px;
+  font-style: italic;
+  display: none; }
 
 .board {
   margin: 15px 0; }

@@ -83,6 +83,7 @@ function initializeGameTree(){
   rootNode = nodeFactory(computer, mainBoard, null);  
   generateTree(rootNode);
   calculateNodesUtility(rootNode);
+  showElement("loading", false);
 }
   
 
@@ -418,6 +419,12 @@ function changeTurn() {
 
 
 
+function showElement(id, value) {
+  document.getElementById(id).style.display = value ? 'block' : 'none';
+}
+
+
+
 document.getElementById('playAgain').onclick = function(){
   initializeBoard();
 }
@@ -428,6 +435,7 @@ document.getElementById('playAgain').onclick = function(){
  * Player X selection on modal event
  */
 document.getElementById('player-x').onclick = function(){
+  showElement("loading", true);
   player1Label.innerText = 'Computer';
   player2Label.innerText = 'Player';
   player2Label.classList.add('currentTurn');
@@ -443,6 +451,7 @@ document.getElementById('player-x').onclick = function(){
  * Player O selection on modal event
  */
 document.getElementById('player-o').onclick = function(){
+  showElement("loading", true);
   player1Label.innerText = 'Player';
   player2Label.innerText = 'Computer';
   player1Label.classList.add('currentTurn');
