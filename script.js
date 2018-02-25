@@ -77,13 +77,13 @@ function initializeBoard(){
 
 /**
  * Initializes the game tree using 
- * the clean board as starting point 
+ * the clean board as starting point
  */
 function initializeGameTree(){
   rootNode = nodeFactory(computer, mainBoard, null);  
   generateTree(rootNode);
   calculateNodesUtility(rootNode);
-  showElement("loading", false);
+  renderPostLoading();
 }
   
 
@@ -124,7 +124,8 @@ function playOnCell(cellId, player) {
 
 
 /**
- * Generates a tree of possible plays of both players starting from given node
+ * Generates a tree of all possible plays of both players starting from given node
+ * The whole tree generation process lasts aproximatelly 2 seconds
  * @param {Object} rootNode
  */
 function generateTree(rootNode){
@@ -380,9 +381,9 @@ Array.prototype.equals = function (array) {
 
   for (i = 0; i < len; i++) {
       
-      if (this[i] != array[i]) {
-        return false;
-      }
+    if (this[i] != array[i]) {
+      return false;
+    }
   }
   return true;
 }
@@ -419,6 +420,36 @@ function changeTurn() {
 
 
 
+/** 
+ * Renders the styles of players
+ * Used for better apreciation of the Loading process
+*/
+function renderPostLoading(){
+  switch(humanPlayer) {
+    case 'X':
+      player1Label.innerText = 'Computer';
+      player2Label.innerText = 'Player';
+      player2Label.classList.add('currentTurn');
+      player2Symbol.classList.add('currentTurn');
+    break;
+
+    case 'O':
+      player1Label.innerText = 'Player';
+      player2Label.innerText = 'Computer';
+      player1Label.classList.add('currentTurn');
+      player1Symbol.classList.add('currentTurn');
+    break;
+  }
+  showElement("loading", false);
+}
+
+
+
+/**
+ * Changes the display property of the given id
+ * @param {Number} id 
+ * @param {Boolean} value 
+ */
 function showElement(id, value) {
   document.getElementById(id).style.display = value ? 'block' : 'none';
 }
@@ -436,10 +467,6 @@ document.getElementById('playAgain').onclick = function(){
  */
 document.getElementById('player-x').onclick = function(){
   showElement("loading", true);
-  player1Label.innerText = 'Computer';
-  player2Label.innerText = 'Player';
-  player2Label.classList.add('currentTurn');
-  player2Symbol.classList.add('currentTurn');
   humanPlayer = 'X';
   computer = 'O';
   playerOnTurn = humanPlayer;
@@ -452,10 +479,6 @@ document.getElementById('player-x').onclick = function(){
  */
 document.getElementById('player-o').onclick = function(){
   showElement("loading", true);
-  player1Label.innerText = 'Player';
-  player2Label.innerText = 'Computer';
-  player1Label.classList.add('currentTurn');
-  player1Symbol.classList.add('currentTurn');
   humanPlayer = 'O';
   computer = 'X';
   playerOnTurn = humanPlayer;
