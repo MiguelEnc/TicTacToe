@@ -80,7 +80,7 @@ function initializeBoard(){
  * the clean board as starting point
  */
 function initializeGameTree(){
-  rootNode = nodeFactory(computer, mainBoard, null);  
+  rootNode = nodeFactory(computer, mainBoard, null);
   generateTree(rootNode);
   calculateNodesUtility(rootNode);
   renderPostLoading();
@@ -94,7 +94,7 @@ function initializeGameTree(){
  */
 function playerClick(cell){
   // human player move
-  playOnCell(cell.target.id, playerOnTurn);
+  playOnCell(cell.target.id, humanPlayer);
   
   // computer move
   var bestMoveForComputer = getBestMove(mainBoard);
@@ -191,33 +191,58 @@ function calculateNodesUtility(rootNode){
 
 
 /**
- * Gets the best move to make from the given board
+ * Returns the best move to make from the given board
  * @param {Array} currentBoard 
  */
 function getBestMove(currentBoard) {
   var move = 0, 
       newRoot = null;
 
+
   // Find currentBoard on the game tree
-  rootNode.getChildNodes().map(child => {
-
-    if(currentBoard.equals(child.getBoard())){
-      newRoot = child;
-    }
-
+  newRoot = rootNode.getChildNodes().find(child => {
+    return child.getBoard().equals(currentBoard);
   });
+
   
-  // Find wich action gave currentBoard its utility
-  // and update rootNode to this child, since future
-  // moves will happend from this position.
+  // Filter wich nodes have same or different utility
+  // from currentBoard (wich now is newRoot)
+  var childsOfSameUtility = [],
+      childsOfDiffUtility = [];
   newRoot.getChildNodes().map(child => {
-
-    if(child.getUtility() === newRoot.getUtility()){
-      move = child.getAction();
-      rootNode = child;
-    }
-
+    if(newRoot.getUtility() == child.getUtility())
+      childsOfSameUtility.push(child);
+    else
+      childsOfDiffUtility.push(child);
   });
+
+
+  var sameLength = childsOfSameUtility.length,
+      diffLength = childsOfDiffUtility.length;
+
+  // When children have same utility as father, select one 
+  // randomly and update rootNode to this child, since future
+  // moves will happend from this position.
+  if(sameLength > 1){
+
+    var rand = Math.floor(Math.random() * sameLength);
+    rootNode = childsOfSameUtility[rand];
+    move = rootNode.getAction();
+
+  } else if(sameLength == 1) {
+    rootNode = childsOfSameUtility[0];
+    move = rootNode.getAction();
+
+  } else if(diffLength > 1){
+
+    var rand = Math.floor(Math.random() * diffLength);
+    rootNode = childsOfDiffUtility[rand];
+    move = rootNode.getAction();
+
+  } else {
+    rootNode = childsOfDiffUtility[0];
+    move = rootNode.getAction();
+  }
 
   return move;
 }
@@ -273,11 +298,6 @@ function nodeFactory(lastPlayer, lastBoard, action) {
   }
 
   if (playerWins(_board, _player)){
-    if(_maximizing){
-      _utility = 10;
-    } else {
-      _utility = -10;
-    }
     _terminal = true;
   } else{
     _terminal = false;
@@ -303,6 +323,13 @@ function nodeFactory(lastPlayer, lastBoard, action) {
     },
 
     getUtility: function(){
+      if (playerWins(this.getBoard(), this.getPlayer())){
+        if(this.isMaximizing()){
+          this.setUtility(-1);
+        } else {
+          this.setUtility(1);
+        }
+      }
       return _utility;
     },
 
