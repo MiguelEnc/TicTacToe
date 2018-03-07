@@ -26,14 +26,11 @@ body {
   margin-top: 0;
   text-align: center; }
 
-.points h4 {
-  text-align: center;
-  margin-top: 25px;
-  margin-bottom: 0px; }
 .points p {
-  margin-top: 5px;
   font-style: italic;
-  display: none; }
+  display: none;
+  margin: 35px auto;
+  font-weight: 600; }
 
 .board {
   margin: 15px 0; }
