@@ -55,7 +55,7 @@ $(document).ready(function(){
 
   // Play again confirmation modal initialization
   $('#playAgainModal').modal({
-      dismissible: true,
+      dismissible: false,
       opacity: .5,
       inDuration: 300,
       outDuration: 200,
@@ -84,6 +84,7 @@ function initializeBoard(){
       i = 0;
   for(i; i < cellsLength; i++){
     cells[i].innerText = '';
+    cells[i].style.cursor = 'pointer';
     cells[i].addEventListener('click', playerClick);
   }
 }
@@ -510,9 +511,6 @@ function renderPostLoading(){
 function announceWinner(player){
   document.getElementById("winner").innerHTML = "Player " + player + " Wins!";
   $('#playAgainModal').modal('open');
-  // TODO:
-  // 1- block clicks on cells
-  // 2- increment winnings count
 }
 
 
@@ -579,8 +577,24 @@ document.getElementById('player-o').onclick = function(){
 
 
 /**
- * Play again confirmation handler
+ * Handler to play again
  */
 document.getElementById("playAgain").onclick = function(){
   restartGame();
+};
+
+
+
+/**
+ * Handler to dont play again
+ * Removes cells event listener to prevent 
+ * further moves after a player has won
+ */
+document.getElementById("dontPlayAgain").onclick = function(){
+  var cells = document.querySelectorAll('.cell'),
+      cellsLength = cells.length;
+  for(var i = 0; i < cellsLength; i++){
+    cells[i].removeEventListener('click', playerClick);
+    cells[i].style.cursor = 'auto';
+  }
 };
