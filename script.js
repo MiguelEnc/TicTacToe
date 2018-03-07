@@ -9,7 +9,10 @@ var
   playerOnTurn = '',
 
   // game tree root node
-  rootNode,
+  rootNode = null,
+  
+  // game winner flag
+  finalWinner = false,
 
   // state of the game board
   mainBoard = [],
@@ -105,16 +108,19 @@ function initializeGameTree(){
  * @param {Object} cell clicked cell
  */
 function playerClick(cell){
+  
   // human player move
   playOnCell(cell.target.id, humanPlayer);
   
-  // TODO: dont call getBestMove when winner is found
-
-  // computer move
-  var bestMoveForComputer = getBestMove(mainBoard);
-  setTimeout(function () {
-    playOnCell(bestMoveForComputer, computer);
-  }, 1000);
+  
+  // get computer move if humman hasn't won yet
+  if(!finalWinner){
+    var bestMoveForComputer = getBestMove(mainBoard);
+    setTimeout(function () {
+      playOnCell(bestMoveForComputer, computer);
+    }, 1000);
+    
+  }
 }
 
 
@@ -133,6 +139,7 @@ function playOnCell(cellId, player) {
 
     if(playerWins(mainBoard, player)){
       announceWinner(player);
+      finalWinner = true;
     } else {
       changeTurn();
     }
@@ -443,7 +450,7 @@ Array.prototype.equals = function (array) {
 
 var player1Symbol = document.getElementById('player1-symbol'),
     player1Label  = document.getElementById('player1-label'),
-    player2Symbol = document.getElementById('player2-symbol')
+    player2Symbol = document.getElementById('player2-symbol'),
     player2Label  = document.getElementById('player2-label');
 
 /**
@@ -538,7 +545,7 @@ function showElement(id, value) {
  */
 document.getElementById('restartGame').onclick = function(){
   restartGame();
-}
+};
 
 
 
@@ -550,7 +557,7 @@ document.getElementById('player-x').onclick = function(){
   humanPlayer = 'X';
   computer = 'O';
   playerOnTurn = humanPlayer;
-}
+};
 
 
 
@@ -562,7 +569,7 @@ document.getElementById('player-o').onclick = function(){
   humanPlayer = 'O';
   computer = 'X';
   playerOnTurn = humanPlayer;
-}
+};
 
 
 
@@ -571,4 +578,4 @@ document.getElementById('player-o').onclick = function(){
  */
 document.getElementById("playAgain").onclick = function(){
   restartGame();
-}
+};
