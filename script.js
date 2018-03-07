@@ -521,9 +521,14 @@ function announceWinner(player){
  * Resets the game to its original state
  */
 function restartGame(){
-  // TODO:
-  // 1 - Reset tree reference (save original tree externally to save time)
-
+  initializeBoard();
+  
+  var currentTurnElements = document.getElementsByClassName('currentTurn');
+  currentTurnElements.item(0).classList.remove('currentTurn');
+  currentTurnElements.item(0).classList.remove('currentTurn');
+  
+  $('#playerSelectionModal').modal('open');
+  finalWinner = false;
 }
 
 
