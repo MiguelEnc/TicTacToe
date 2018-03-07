@@ -40,7 +40,7 @@
       </tr>
     </table>
     <div class="bottom-panel">
-      <button id="playAgain">Play Again</button>
+      <button id="restartGame">Restart Game</button>
     </div>
   </div>
   <div id="playerSelectionModal" class="modal">
@@ -49,6 +49,16 @@
       <div>
         <a class="waves-effect waves-light btn-large modal-action modal-close" id="player-x">X</a>
         <a class="waves-effect waves-light btn-large modal-action modal-close" id="player-o">O</a>
+      </div>
+    </div>
+  </div>
+  <div id="playAgainModal" class="modal">
+    <div class="modal-content" style="text-align:center;">
+      <h4 id="winner"></h4>
+      <p>Want to play again?</p>
+      <div>
+        <a class="waves-effect waves-light btn modal-action modal-close" id="playAgain">Yes</a>
+        <a class="waves-effect waves-light btn modal-action modal-close">No</a>
       </div>
     </div>
   </div>

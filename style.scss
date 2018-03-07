@@ -94,8 +94,8 @@ body {
   text-align: center;
   padding: 15px;
   
-  #playAgain {
-    width: 120px;
+  #restartGame {
+    width: 130px;
     height: 45px;
     color: #fff;
     font-size: 17px;
@@ -104,6 +104,9 @@ body {
   }
 }
 
+.btn {
+  background-color: $grey;
+}
 
 .btn-large {
   height: 65px;
@@ -112,10 +115,11 @@ body {
   background-color: $grey;
   font-size: 2em;
   font-weight: 600;
-  
-  .btn-large:hover {
-    background-color: $blue;
-  }
+}
+
+.btn:hover, .btn-large:hover {
+  color: $grey;
+  background-color: $blue;
 }
 
 #player-o {
@@ -123,5 +127,5 @@ body {
 }
 
 .currentTurn {
-  font-weight: 800;
+  font-weight: 600;
 }

@@ -56,13 +56,16 @@ body {
 .bottom-panel {
   text-align: center;
   padding: 15px; }
-  .bottom-panel #playAgain {
-    width: 120px;
+  .bottom-panel #restartGame {
+    width: 130px;
     height: 45px;
     color: #fff;
     font-size: 17px;
     background-color: #5f5f5f;
     cursor: pointer; }
+
+.btn {
+  background-color: #5f5f5f; }
 
 .btn-large {
   height: 65px;
@@ -71,13 +74,15 @@ body {
   background-color: #5f5f5f;
   font-size: 2em;
   font-weight: 600; }
-  .btn-large .btn-large:hover {
-    background-color: #CBDBF6; }
+
+.btn:hover, .btn-large:hover {
+  color: #5f5f5f;
+  background-color: #CBDBF6; }
 
 #player-o {
   margin-left: 40px; }
 
 .currentTurn {
-  font-weight: 800; }
+  font-weight: 600; }
 
 /*# sourceMappingURL=style.css.map */
