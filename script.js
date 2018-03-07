@@ -32,7 +32,7 @@ var
 
 $(document).ready(function(){
 
-  // Player selection modal configuration
+  // Player selection modal initialization
   $('#playerSelectionModal').modal({
       dismissible: false,
       opacity: .5,
@@ -49,6 +49,18 @@ $(document).ready(function(){
       }
     }
   );
+
+  // Play again confirmation modal initialization
+  $('#playAgainModal').modal({
+      dismissible: true,
+      opacity: .5,
+      inDuration: 300,
+      outDuration: 200,
+      startingTop: '4%',
+      endingTop: '30%'
+    }
+  );
+
   $('#playerSelectionModal').modal('open');
   initializeBoard();
 });
@@ -96,6 +108,8 @@ function playerClick(cell){
   // human player move
   playOnCell(cell.target.id, humanPlayer);
   
+  // TODO: dont call getBestMove when winner is found
+
   // computer move
   var bestMoveForComputer = getBestMove(mainBoard);
   setTimeout(function () {
@@ -113,13 +127,15 @@ function playerClick(cell){
 function playOnCell(cellId, player) {
 
   // When the position hasn't been played
-  if(mainBoard[cellId] !== humanPlayer & 
-     mainBoard[cellId] !== computer){
-    
+  if(mainBoard[cellId] === ""){
     mainBoard[cellId] = player;
     document.getElementById(cellId).innerText = player;
 
-    changeTurn();
+    if(playerWins(mainBoard, player)){
+      announceWinner(player);
+    } else {
+      changeTurn();
+    }
   }
 }
 
@@ -378,13 +394,19 @@ function nodeFactory(lastPlayer, lastBoard, action) {
  */
 function playerWins(board, player) {
   let wins = false;
+
   winPositions.map(winCombo => {
-    if(board[winCombo[0]] === board[winCombo[1]] &&
-       board[winCombo[0]] === board[winCombo[2]] &&
-       board[winCombo[0]] === player){
+    var pos0 = winCombo[0],
+        pos1 = winCombo[1],
+        pos2 = winCombo[2];
+
+    if(board[pos0] === board[pos1] &&
+       board[pos0] === board[pos2] &&
+       board[pos0] === player){
       wins = true;
     }
   });
+
   return wins;
 }
 
@@ -475,7 +497,33 @@ function renderPostLoading(){
 
 
 /**
+ * Displays the winner modal and increments the winning count
+ * @param {string} player winner
+ */
+function announceWinner(player){
+  document.getElementById("winner").innerHTML = "Player " + player + " Wins!";
+  $('#playAgainModal').modal('open');
+  // TODO:
+  // 1- block clicks on cells
+  // 2- increment winnings count
+}
+
+
+
+/**
+ * Resets the game to its original state
+ */
+function restartGame(){
+  // TODO:
+  // 1 - Reset tree reference (save original tree externally to save time)
+
+}
+
+
+
+/**
  * Changes the display property of the given id
+ * Used to show/hide Loading label on board
  * @param {Number} id 
  * @param {Boolean} value 
  */
@@ -485,14 +533,17 @@ function showElement(id, value) {
 
 
 
-document.getElementById('playAgain').onclick = function(){
-  initializeBoard();
+/**
+ * Restart game button event handler
+ */
+document.getElementById('restartGame').onclick = function(){
+  restartGame();
 }
 
 
 
 /**
- * Player X selection on modal event
+ * Player X event handler on selection modal
  */
 document.getElementById('player-x').onclick = function(){
   showElement("loading", true);
@@ -504,11 +555,20 @@ document.getElementById('player-x').onclick = function(){
 
 
 /**
- * Player O selection on modal event
+ * Player O event handler on selection modal
  */
 document.getElementById('player-o').onclick = function(){
   showElement("loading", true);
   humanPlayer = 'O';
   computer = 'X';
   playerOnTurn = humanPlayer;
+}
+
+
+
+/**
+ * Play again confirmation handler
+ */
+document.getElementById("playAgain").onclick = function(){
+  restartGame();
 }
