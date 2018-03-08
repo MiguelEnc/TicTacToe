@@ -7,6 +7,10 @@ var
 
   // reference to who's playing at the moment
   playerOnTurn = '',
+  
+  // game tree root node. Used to update
+  // rootNode on game restart
+  treeNode = null,
 
   // game tree root node
   rootNode = null,
@@ -100,6 +104,7 @@ function initializeGameTree(){
   generateTree(rootNode);
   calculateNodesUtility(rootNode);
   renderPostLoading();
+  treeNode = rootNode;
 }
   
 
@@ -506,11 +511,38 @@ function renderPostLoading(){
 
 /**
  * Displays the winner modal and increments the winning count
- * @param {string} player winner
+ * @param {string} winning player
  */
 function announceWinner(player){
   document.getElementById("winner").innerHTML = "Player " + player + " Wins!";
   $('#playAgainModal').modal('open');
+  incrementPlayerWinningCount(player);
+}
+
+
+
+/**
+ * Wins count handler
+ * @param {string} winning player
+*/
+function incrementPlayerWinningCount(player) {
+  var currPoints = 0,
+      pointsO = document.getElementById("p1-points").innerHTML,
+      pointsX = document.getElementById("p2-points").innerHTML;
+  
+  switch(humanPlayer) {
+    case 'X':
+      currPoints = parseInt(pointsX);
+      currPoints++;
+      document.getElementById("p2-points").innerHTML = currPoints.toString();
+    break;
+
+    case 'O':
+      currPoints = parseInt(pointsO);
+      currPoints++;
+      document.getElementById("p1-points").innerHTML = currPoints.toString();
+    break;
+  }
 }
 
 
@@ -519,14 +551,15 @@ function announceWinner(player){
  * Resets the game to its original state
  */
 function restartGame(){
-  initializeBoard();
-  
   var currentTurnElements = document.getElementsByClassName('currentTurn');
   currentTurnElements.item(0).classList.remove('currentTurn');
   currentTurnElements.item(0).classList.remove('currentTurn');
   
-  $('#playerSelectionModal').modal('open');
   finalWinner = false;
+  rootNode = treeNode;
+  
+  initializeBoard();
+  renderPostLoading();
 }
 
 
